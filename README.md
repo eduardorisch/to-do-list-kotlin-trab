@@ -1,4 +1,7 @@
 # To-do-list
+Nome: Eduardo A. Risch
+RM: 555212
+
 ## Descrição do Projeto
 O projeto consiste no desenvolvimento de um aplicativo de uma lista de tarefas. Ele permite que o usuário gerencie suas tarefas de forma simples, possibilitando **criar, visualizar, editar, concluir e excluir tarefas**.
 
