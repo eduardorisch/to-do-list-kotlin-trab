@@ -250,21 +250,8 @@ fun FormularioTarefaContent(
 
             Button(
                 onClick = {
-                    val dataHora = if (
-                        temDataHora &&
-                        ano != null &&
-                        mes != null &&
-                        dia != null &&
-                        hora != null &&
-                        minuto != null
-                    ) {
-                        combinarDataHora(
-                            ano!!,
-                            mes!!,
-                            dia!!,
-                            hora!!,
-                            minuto!!
-                        )
+                    val dataHora = if (temDataHora) {
+                        combinarDataHora(ano!!, mes!!, dia!!, hora!!, minuto!!)
                     } else {
                         null
                     }
