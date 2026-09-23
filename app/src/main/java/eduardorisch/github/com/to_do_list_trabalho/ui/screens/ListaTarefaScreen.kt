@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,9 +26,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -116,26 +121,40 @@ private fun TarefaItem(
     onEditar: () -> Unit,
     onDeletar: () -> Unit
 ) {
+    var mostrarDialogoExcluir by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onEditar)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
+            modifier = Modifier.padding(
+                horizontal = 8.dp,
+                vertical = 12.dp
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
                 checked = tarefa.concluida,
                 onCheckedChange = onCheckedChange
             )
+
             Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = tarefa.titulo,
                     style = MaterialTheme.typography.titleMedium,
-                    textDecoration = if (tarefa.concluida) TextDecoration.LineThrough else TextDecoration.None
+                    textDecoration = if (tarefa.concluida) {
+                        TextDecoration.LineThrough
+                    } else {
+                        TextDecoration.None
+                    }
                 )
+
                 if (tarefa.descricao.isNotBlank()) {
                     Text(
                         text = tarefa.descricao,
@@ -144,21 +163,91 @@ private fun TarefaItem(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+
                 if (tarefa.dataHora != null) {
-                    val atrasada = tarefa.dataHora < System.currentTimeMillis() && !tarefa.concluida
+                    val atrasada =
+                        tarefa.dataHora < System.currentTimeMillis() &&
+                                !tarefa.concluida
+
                     Text(
                         text = formatarDataHora(tarefa.dataHora),
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (atrasada) MaterialTheme.colorScheme.error else Color.Unspecified,
-                        fontWeight = if (atrasada) FontWeight.Bold else FontWeight.Normal
+                        color = if (atrasada) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            Color.Unspecified
+                        },
+                        fontWeight = if (atrasada) {
+                            FontWeight.Bold
+                        } else {
+                            FontWeight.Normal
+                        }
                     )
                 }
             }
-            IconButton(onClick = onDeletar) {
-                Icon(Icons.Default.Delete, contentDescription = "Deletar tarefa")
+
+            IconButton(
+                onClick = {
+                    mostrarDialogoExcluir = true
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Deletar tarefa"
+                )
             }
         }
     }
+
+    if (mostrarDialogoExcluir) {
+        DialogoExcluirTarefa(
+            tarefa = tarefa,
+            onConfirmar = {
+                onDeletar()
+                mostrarDialogoExcluir = false
+            },
+            onCancelar = {
+                mostrarDialogoExcluir = false
+            }
+        )
+    }
+}
+
+@Composable
+private fun DialogoExcluirTarefa(
+    tarefa: Tarefa,
+    onConfirmar: () -> Unit,
+    onCancelar: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onCancelar,
+
+        title = {
+            Text("Excluir tarefa?")
+        },
+
+        text = {
+            Text(
+                "A tarefa \"${tarefa.titulo}\" será excluída permanentemente."
+            )
+        },
+
+        confirmButton = {
+            TextButton(
+                onClick = onConfirmar
+            ) {
+                Text("Excluir")
+            }
+        },
+
+        dismissButton = {
+            TextButton(
+                onClick = onCancelar
+            ) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true, name = "Lista com tarefas")
@@ -236,5 +325,25 @@ private fun TarefaItemAtrasadaPreview() {
         onCheckedChange = {},
         onEditar = {},
         onDeletar = {}
+    )
+}
+
+@Preview(
+    showBackground = true,
+    name = "Confirmação de exclusão"
+)
+@Composable
+private fun DialogoExcluirTarefaPreview() {
+    val tarefa = Tarefa(
+        id = 10,
+        titulo = "Entregar atividade",
+        descricao = "Enviar a atividade no portal da FIAP",
+        concluida = false
+    )
+
+    DialogoExcluirTarefa(
+        tarefa = tarefa,
+        onConfirmar = {},
+        onCancelar = {}
     )
 }
