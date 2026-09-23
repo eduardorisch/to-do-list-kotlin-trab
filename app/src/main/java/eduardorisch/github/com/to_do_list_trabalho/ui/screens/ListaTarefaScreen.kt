@@ -334,16 +334,21 @@ private fun TarefaItemAtrasadaPreview() {
 )
 @Composable
 private fun DialogoExcluirTarefaPreview() {
-    val tarefa = Tarefa(
-        id = 10,
-        titulo = "Entregar atividade",
-        descricao = "Enviar a atividade no portal da FIAP",
-        concluida = false
-    )
-
-    DialogoExcluirTarefa(
-        tarefa = tarefa,
-        onConfirmar = {},
-        onCancelar = {}
-    )
+    MaterialTheme {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            DialogoExcluirTarefa(
+                tarefa = Tarefa(
+                    id = 10,
+                    titulo = "Entregar atividade",
+                    descricao = "Enviar a atividade no portal da FIAP",
+                    concluida = false
+                ),
+                onConfirmar = {},
+                onCancelar = {}
+            )
+        }
+    }
 }
